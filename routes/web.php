@@ -4,6 +4,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\QualificationController;
+use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\WorkshopController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,4 +47,11 @@ use Illuminate\Support\Facades\Route;
         Route::get('workshop-export-pdf-default', [WorkshopController::class, 'exportPdf'])->name('workshop.export-pdf-default');
         Route::get('workshop-export-excel-default', [WorkshopController::class, 'exportExcel'])->name('workshop.export-excel-default');
         Route::post('workshop-import-excel-default', [WorkshopController::class, 'importExcel'])->name('workshop.import-excel-default');
+
+        // Route Training
+        Route::resource('training', TrainingController::class);
+        Route::get('training-api', [TrainingController::class, 'indexApi'])->name('training.listapi');
+        Route::get('training-export-pdf-default', [TrainingController::class, 'exportPdf'])->name('training.export-pdf-default');
+        Route::get('training-export-excel-default', [TrainingController::class, 'exportExcel'])->name('training.export-excel-default');
+        Route::post('training-import-excel-default', [TrainingController::class, 'importExcel'])->name('training.import-excel-default');
     });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Position;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 
@@ -46,22 +47,17 @@ class PositionController extends DefaultController
             $edit = $this->modelClass::where('id', $id)->first();
         }
 
-        $department = [
-        ['value' => 1, 'text' => 'Nama User 1'],
-        ['value' => 5, 'text' => 'Nama User 2'],
-        ['value' => 9, 'text' => 'Nama User 3'],
-        // dan seterusnya
-    ] ;
+        $department = Department::select(['id as value', 'name as text'])->get();
 
         $fields = [
                     [
-                        'type' => 'text',
+                        'type' => 'select2',
                         'label' => 'Department',
                         'name' =>  'department_id',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
                         'value' => (isset($edit)) ? $edit->department_id : '',
-                        // 'option' => $department
+                        'options' => $department
                     ],
                     [
                         'type' => 'text',
@@ -84,5 +80,28 @@ class PositionController extends DefaultController
 
         return $rules;
     }
+
+    // private function defaultDataQuery()
+    // {
+    //     $filters = [];
+    //     $orThose = null;
+    //     $orderBy = 'id';
+    //     $orderState = 'DESC';
+    //     if(request('search')){
+    //         $orThose = request('search');
+    //     }
+    //     if(request('order')){
+    //         $orderBy = request('order');
+    //         $orderState = request('order_state');
+    //     }
+
+    //     $dataQuery = Position::where($filters)
+    //         ->where(function ($query) use ($orThose) {
+    //             $query->where('name', 'LIKE', '%' . $orThose . '%');
+    //         })
+    //         ->orderBy($orderBy, $orderState);
+
+    //     return $dataQuery;
+    // }
 
 }

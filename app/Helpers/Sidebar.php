@@ -94,32 +94,13 @@ class Sidebar
           'childrens' => []
         ],
         [
-          'name' => 'Master Data',
-          'icon' => 'ti ti-dashboard',
-          'key' => 'dashboard',
-          'base_key' => 'dashboard',
+          'name' => 'Training',
+          'icon' => 'ti ti-calendar',
+          'key' => 'training',
+          'base_key' => 'training',
           'visibility' => true,
           'ajax_load' => false,
-          'childrens' => [
-            [
-              'name' => 'Department',
-              'icon' => 'ti ti-menu',
-              'key' => 'department',
-              'base_key' => 'department',
-              'visibility' => true,
-              'ajax_load' => false,
-              'childrens' => []
-            ],
-            [
-              'name' => 'Department',
-              'icon' => 'ti ti-menu',
-              'key' => 'department',
-              'base_key' => 'department',
-              'visibility' => true,
-              'ajax_load' => false,
-              'childrens' => []
-            ],
-          ]
+          'childrens' => []
         ],
         [
           'name' => 'Role',

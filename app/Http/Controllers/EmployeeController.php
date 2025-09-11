@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\Employee;
+use App\Models\Position;
+use App\Models\Qualification;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 
 class EmployeeController extends DefaultController
@@ -49,6 +52,16 @@ class EmployeeController extends DefaultController
             $edit = $this->modelClass::where('id', $id)->first();
         }
 
+        $gender = [
+            ['value' => 'L', 'text' => 'Male'],
+            ['value' => 'P', 'text' => 'Female'],
+        ];
+
+
+        $department = Department::select(['id as value', 'name as text'])->get();
+        $position = Position::select(['id as value', 'name as text'])->get();
+        $qualification = Qualification::select(['id as value', 'name as text'])->get();
+
         $fields = [
                     [
                         'type' => 'text',
@@ -83,36 +96,40 @@ class EmployeeController extends DefaultController
                         'value' => (isset($edit)) ? $edit->phone_number : ''
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'select2',
                         'label' => 'Gender',
                         'name' =>  'gender',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->gender : ''
+                        'value' => (isset($edit)) ? $edit->gender : '',
+                        'options' => $gender
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'select2',
                         'label' => 'Department',
                         'name' =>  'department_id',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->department_id : ''
+                        'value' => (isset($edit)) ? $edit->department_id : '',
+                        'options' => $department
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'select2',
                         'label' => 'Position',
                         'name' =>  'position_id',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->position_id : ''
+                        'value' => (isset($edit)) ? $edit->position_id : '',
+                        'options' => $position
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'select2',
                         'label' => 'Qualification',
                         'name' =>  'qualification_id',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->qualification_id : ''
+                        'value' => (isset($edit)) ? $edit->qualification_id : '',
+                        'options' => $qualification
                     ],
         ];
         
