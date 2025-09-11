@@ -81,27 +81,4 @@ class PositionController extends DefaultController
         return $rules;
     }
 
-    // private function defaultDataQuery()
-    // {
-    //     $filters = [];
-    //     $orThose = null;
-    //     $orderBy = 'id';
-    //     $orderState = 'DESC';
-    //     if(request('search')){
-    //         $orThose = request('search');
-    //     }
-    //     if(request('order')){
-    //         $orderBy = request('order');
-    //         $orderState = request('order_state');
-    //     }
-
-    //     $dataQuery = Position::where($filters)
-    //         ->where(function ($query) use ($orThose) {
-    //             $query->where('name', 'LIKE', '%' . $orThose . '%');
-    //         })
-    //         ->orderBy($orderBy, $orderState);
-
-    //     return $dataQuery;
-    // }
-
 }

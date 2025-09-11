@@ -49,6 +49,23 @@ class Sidebar
           'childrens' => []
         ],
         [
+          'name' => 'Master Data',
+          'icon' => 'ti ti-database',
+          'key' => 'department',
+          'base_key' => 'department',
+          'visibility' => true,
+          'ajax_load' => false,
+          'childrens' => [
+            [
+              'name' => 'Department',
+              'icon' => 'ti ti-menu',
+              'key' => 'department.index',
+              'visibility' => true,
+              'ajax_load' => false,
+            ],
+          ]
+        ],
+        [
           'name' => 'Department',
           'icon' => 'ti ti-menu',
           'key' => 'department',
