@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Training;
+use App\Models\Employee;
+use App\Models\TrainingParticipant;
+use App\Models\Workshop;
+use Dotenv\Validator;
+use Exception;
+use GuzzleHttp\Psr7\Request;
 use Idev\EasyAdmin\app\Helpers\Constant;
+use Idev\EasyAdmin\app\Helpers\Validation;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
+use Illuminate\Container\Attributes\DB;
 
-class TrainingController extends DefaultController
+class TrainingParticipantController extends DefaultController
 {
-    protected $modelClass = Training::class;
+    protected $modelClass = TrainingParticipant::class;
     protected $title;
     protected $generalUri;
     protected $tableHeaders;
@@ -18,17 +25,17 @@ class TrainingController extends DefaultController
 
     public function __construct()
     {
-        $this->title = 'Training';
-        $this->generalUri = 'training';
+        $this->title = 'Training Participant';
+        $this->generalUri = 'training-participant';
         // $this->arrPermissions = [];
         $this->actionButtons = ['btn_edit', 'btn_show', 'btn_delete'];
 
         $this->tableHeaders = [
                     ['name' => 'No', 'column' => '#', 'order' => true], 
-                    ['name' => 'Years', 'column' => 'year', 'order' => true], 
-                    ['name' => 'Description', 'column' => 'description', 'order' => true], 
-                    ['name' => 'Created', 'column' => 'created', 'order' => true], 
-                    ['name' => 'Status', 'column' => 'status', 'order' => true], 
+                    ['name' => 'Workshop', 'column' => 'workshop', 'order' => true], 
+                    ['name' => 'Employee', 'column' => 'employee', 'order' => true], 
+                    ['name' => 'Department', 'column' => 'department', 'order' => true], 
+                    ['name' => 'Date', 'column' => 'date', 'order' => true], 
                     ['name' => 'Created at', 'column' => 'created_at', 'order' => true],
                     ['name' => 'Updated at', 'column' => 'updated_at', 'order' => true],
         ];
@@ -106,16 +113,19 @@ class TrainingController extends DefaultController
             $orderState = request('order_state');
         }
 
-        $dataQueries = Training::join('users', 'users.id', '=', 'trainings.user_id')
+        $dataQueries = TrainingParticipant::join('employees', 'employees.id', '=', 'training_participants.employee_id')
+        ->join('trainings', 'trainings.id', '=', 'training_participants.training_id')
+        ->join('workshops', 'workshops.id', '=', 'training_participants.workshop_id')
+        ->join('departments', 'departments.id', '=', 'employees.department_id')
         ->where($filters)
         ->where(function ($query) use ($orThose) {
-            $query->where('trainings.year', 'LIKE', '%' . $orThose . '%');
-            $query->where('trainings.description', 'LIKE', '%' . $orThose . '%');
-            $query->where('users.name', 'LIKE', '%' . $orThose . '%');
-            $query->where('trainings.status', 'LIKE', '%' . $orThose . '%');
+            $query->where('workshops.name', 'LIKE', '%' . $orThose . '%');
+            $query->where('employees.first_name', 'LIKE', '%' . $orThose . '%');
+            $query->where('departments.name', 'LIKE', '%' . $orThose . '%');
+            $query->where('training_participants.date', 'LIKE', '%' . $orThose . '%');
         })
         ->orderBy($orderBy, $orderState)
-        ->select('trainings.*', 'users.name as created');
+        ->select('training_participants.*', 'workshops.name as workshop', 'employees.first_name as employee', 'departments.name as department',);
 
         return $dataQueries;
     }
@@ -127,44 +137,71 @@ class TrainingController extends DefaultController
             $edit = $this->modelClass::where('id', $id)->first();
         }
 
+        $workshop = Workshop::select(['id as value', 'name as text'])->get();
+
         $fields = [
-                    [
-                        'type' => 'text',
-                        'label' => 'User Id',
-                        'name' =>  'user_id',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->user_id : ''
-                    ],
-                    [
-                        'type' => 'text',
-                        'label' => 'Year',
-                        'name' =>  'year',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->year : ''
-                    ],
-                    [
-                        'type' => 'text',
-                        'label' => 'Status',
-                        'name' =>  'status',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->status : ''
-                    ],
-                    [
-                        'type' => 'textarea',
-                        'label' => 'Description',
-                        'name' =>  'description',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->description : ''
-                    ],
+            [
+                    'type' => 'select2',
+                    'label' => 'Workshop',
+                    'name' => 'workshop_id',
+                    'class' => 'col-md-12 my-2',
+                    'options' => $workshop,
+                    'value' => ''
+                ],
+                [
+                    'type' => 'datetime',
+                    'label' => 'Date',
+                    'name' =>  'date',
+                    'class' => 'col-md-12 my-2',
+                    'required' => $this->flagRules('name', $id),
+                    'value' => (isset($edit)) ? $edit->name : ''
+                ],
+                [
+                    'type' => 'bulktable_ajax',
+                    'label' => 'Peserta',
+                    'name' => 'participants',
+                    'class' => 'col-md-12 my-2',
+                    'key' => 'id',
+                    'ajaxUrl' => url('participant-ajax'),
+                    'table_headers' => ['Name', 'Department', 'Position']
+                ],
         ];
         
         return $fields;
     }
 
+    public function participantAjax()
+    {
+        $filters = [];
+        $orThose = null;
+        if (request('search')) {
+            $orThose = request('search');
+        }
+
+        $dataQueries = Employee::join('departments', 'departments.id', '=', 'employees.department_id')
+            ->join('positions', 'positions.id', '=', 'employees.position_id')
+            ->join('qualifications', 'qualifications.id', '=', 'employees.qualification_id')
+            ->where($filters)
+            ->where(function ($query) use ($orThose) {
+                $query->where('employees.first_name', 'LIKE', '%' . $orThose . '%')
+                    ->orWhere('employees.email', 'LIKE', '%' . $orThose . '%')
+                    ->orWhere('departments.name', 'LIKE', '%' . $orThose . '%')
+                    ->orWhere('positions.name', 'LIKE', '%' . $orThose . '%')
+                    ->orWhere('qualifications.name', 'LIKE', '%' . $orThose . '%');
+            })
+                ->select(
+                'employees.first_name as employee',
+                'departments.name as department',
+                'positions.name as position',
+                'qualifications.name as qualification'
+            )
+            ->paginate(10);
+
+        $data['header'] = ['employee', 'department', 'position'];
+        $data['body'] = $dataQueries;
+
+        return $data;
+    }
 
     protected function rules($id = null)
     {

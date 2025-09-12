@@ -103,6 +103,15 @@ class Sidebar
           'childrens' => []
         ],
         [
+            'name' => 'Training Participant',
+            'icon' => 'ti ti-menu',
+            'key' => 'training-participant',
+            'base_key' => 'training-participant',
+            'visibility' => true,
+            'ajax_load' => false,
+            'childrens' => []
+          ],
+        [
           'name' => 'Role',
           'icon' => 'ti ti-key',
           'key' => 'role',

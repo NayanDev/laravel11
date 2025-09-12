@@ -5,6 +5,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\TrainingParticipantController;
 use App\Http\Controllers\WorkshopController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,4 +55,12 @@ use Illuminate\Support\Facades\Route;
         Route::get('training-export-pdf-default', [TrainingController::class, 'exportPdf'])->name('training.export-pdf-default');
         Route::get('training-export-excel-default', [TrainingController::class, 'exportExcel'])->name('training.export-excel-default');
         Route::post('training-import-excel-default', [TrainingController::class, 'importExcel'])->name('training.import-excel-default');
+
+        // Route Training Participant
+        Route::resource('training-participant', TrainingParticipantController::class);
+        Route::get('training-participant-api', [TrainingParticipantController::class, 'indexApi'])->name('training-participant.listapi');
+        Route::get('training-participant-export-pdf-default', [TrainingParticipantController::class, 'exportPdf'])->name('training-participant.export-pdf-default');
+        Route::get('training-participant-export-excel-default', [TrainingParticipantController::class, 'exportExcel'])->name('training-participant.export-excel-default');
+        Route::post('training-participant-import-excel-default', [TrainingParticipantController::class, 'importExcel'])->name('training-participant.import-excel-default');
+        Route::get('participant-ajax', [TrainingParticipantController::class, 'participantAjax']);
     });
