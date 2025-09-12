@@ -63,52 +63,35 @@ class Sidebar
               'visibility' => true,
               'ajax_load' => false,
             ],
+            [
+              'name' => 'Position',
+              'icon' => 'ti ti-menu',
+              'key' => 'position.index',
+              'visibility' => true,
+              'ajax_load' => false,
+            ],
+            [
+              'name' => 'Qualification',
+              'icon' => 'ti ti-menu',
+              'key' => 'qualification.index',
+              'visibility' => true,
+              'ajax_load' => false,
+            ],
+            [
+              'name' => 'Employee',
+              'icon' => 'ti ti-menu',
+              'key' => 'employee.index',
+              'visibility' => true,
+              'ajax_load' => false,
+            ],
+            [
+              'name' => 'Workshop',
+              'icon' => 'ti ti-menu',
+              'key' => 'workshop.index',
+              'visibility' => true,
+              'ajax_load' => false,
+            ],
           ]
-        ],
-        [
-          'name' => 'Department',
-          'icon' => 'ti ti-menu',
-          'key' => 'department',
-          'base_key' => 'department',
-          'visibility' => true,
-          'ajax_load' => false,
-          'childrens' => []
-        ],
-        [
-          'name' => 'Position',
-          'icon' => 'ti ti-menu',
-          'key' => 'position',
-          'base_key' => 'position',
-          'visibility' => true,
-          'ajax_load' => false,
-          'childrens' => []
-        ],
-        [
-          'name' => 'Qualification',
-          'icon' => 'ti ti-menu',
-          'key' => 'qualification',
-          'base_key' => 'qualification',
-          'visibility' => true,
-          'ajax_load' => false,
-          'childrens' => []
-        ],
-        [
-          'name' => 'Employee',
-          'icon' => 'ti ti-menu',
-          'key' => 'employee',
-          'base_key' => 'employee',
-          'visibility' => true,
-          'ajax_load' => false,
-          'childrens' => []
-        ],
-        [
-          'name' => 'Workshop',
-          'icon' => 'ti ti-menu',
-          'key' => 'workshop',
-          'base_key' => 'workshop',
-          'visibility' => true,
-          'ajax_load' => false,
-          'childrens' => []
         ],
         [
           'name' => 'Training',
