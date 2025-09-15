@@ -12,7 +12,7 @@ class TrainingController extends DefaultController
     protected $title;
     protected $generalUri;
     protected $tableHeaders;
-    // protected $actionButtons;
+    protected $actionButtons;
     // protected $arrPermissions;
     protected $importExcelConfig;
 
@@ -21,7 +21,7 @@ class TrainingController extends DefaultController
         $this->title = 'Training';
         $this->generalUri = 'training';
         // $this->arrPermissions = [];
-        $this->actionButtons = ['btn_edit', 'btn_show', 'btn_delete'];
+        $this->actionButtons = ['btn_edit', 'btn_show', 'btn_multilink', 'btn_delete'];
 
         $this->tableHeaders = [
                     ['name' => 'No', 'column' => '#', 'order' => true], 
@@ -83,7 +83,10 @@ class TrainingController extends DefaultController
         $data['url_store'] = route($this->generalUri . '.store');
         $data['fields'] = $this->fields();
         $data['edit_fields'] = $this->fields('edit');
-        $data['actionButtonViews'] = $this->actionButtonViews;
+        $data['actionButtonViews'] = [
+            'easyadmin::backend.idev.buttons.delete', 'easyadmin::backend.idev.buttons.edit', 'easyadmin::backend.idev.buttons.show', 'easyadmin::backend.idev.buttons.import_default',
+            'easyadmin::backend.idev.buttons.multilink', 
+        ];
         $data['templateImportExcel'] = "#";
         $data['import_scripts'] = $this->importScripts;
         $data['import_styles'] = $this->importStyles;
