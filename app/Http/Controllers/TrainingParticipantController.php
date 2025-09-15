@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\TrainingParticipant;
 use App\Models\Workshop;
-use Dotenv\Validator;
+use Illuminate\Support\Facades\Validator;
 use Exception;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Helpers\Validation;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
-use Illuminate\Container\Attributes\DB;
+use Illuminate\Support\Facades\DB;
 
 class TrainingParticipantController extends DefaultController
 {
@@ -167,7 +167,7 @@ class TrainingParticipantController extends DefaultController
                 ],
                 [
                     'type' => 'bulktable_ajax',
-                    'label' => 'Peserta',
+                    'label' => 'Participant',
                     'name' => 'participants',
                     'class' => 'col-md-12 my-2',
                     'key' => 'id',
@@ -220,4 +220,57 @@ class TrainingParticipantController extends DefaultController
         return $rules;
     }
 
+    protected function store(Request $request)
+    {
+        $rules = $this->rules();
+        $strParticipants = $request->participants;
+        $trainingId = $request->training_id;
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $messageErrors = (new Validation)->modify($validator, $rules);
+
+            return response()->json([
+                'status' => false,
+                'alert' => 'danger',
+                'message' => 'Required Form',
+                'validation_errors' => $messageErrors,
+            ], 200);
+        }
+
+        DB::beginTransaction();
+
+        try 
+        {
+            $arrParticipant = json_decode($strParticipants, true);
+            $users = Employee::whereIn('id', $arrParticipant)->get();
+
+            foreach($users as $key => $user){
+                $insert = new TrainingParticipant();
+                $insert->employee_id = $user->id;
+                $insert->training_id = $trainingId;
+                $insert->workshop_id = 1;
+                $insert->plan = 'planned';
+                $insert->status = '';
+                $insert->user_id = 1;
+                $insert->date = date('Y');
+                $insert->save();
+            }
+            
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'alert' => 'success',
+                'message' => 'Data Was Created Successfully',
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

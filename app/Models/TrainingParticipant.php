@@ -11,7 +11,7 @@ class TrainingParticipant extends Model
 
     protected $table = 'training_participants';
     protected $primaryKey = 'id';
-    protected $fillable = [];
+    protected $fillable = ['employee_id','training_id','workshop_id','plan','status','user_id','date',];
     protected $appends = ['btn_delete', 'btn_edit', 'btn_show'];
 
 

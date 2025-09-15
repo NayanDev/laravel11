@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\Training;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Idev\EasyAdmin\app\Helpers\Validation;
+use Illuminate\Support\Facades\DB;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
+use Illuminate\Support\Facades\Auth;
 
 class TrainingController extends DefaultController
 {
@@ -166,7 +172,15 @@ class TrainingController extends DefaultController
 
         $fields = [
                     [
-                        'type' => 'text',
+                        'type' => 'textarea',
+                        'label' => 'Description',
+                        'name' =>  'description',
+                        'class' => 'col-md-12 my-2',
+                        'required' => $this->flagRules('name', $id),
+                        'value' => (isset($edit)) ? $edit->description : ''
+                    ],
+                    [
+                        'type' => 'hidden',
                         'label' => 'User Id',
                         'name' =>  'user_id',
                         'class' => 'col-md-12 my-2',
@@ -174,7 +188,7 @@ class TrainingController extends DefaultController
                         'value' => (isset($edit)) ? $edit->user_id : ''
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'hidden',
                         'label' => 'Year',
                         'name' =>  'year',
                         'class' => 'col-md-12 my-2',
@@ -182,20 +196,12 @@ class TrainingController extends DefaultController
                         'value' => (isset($edit)) ? $edit->year : ''
                     ],
                     [
-                        'type' => 'text',
+                        'type' => 'hidden',
                         'label' => 'Status',
                         'name' =>  'status',
                         'class' => 'col-md-12 my-2',
                         'required' => $this->flagRules('name', $id),
                         'value' => (isset($edit)) ? $edit->status : ''
-                    ],
-                    [
-                        'type' => 'textarea',
-                        'label' => 'Description',
-                        'name' =>  'description',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->description : ''
                     ],
         ];
         
@@ -211,4 +217,49 @@ class TrainingController extends DefaultController
         return $rules;
     }
 
+    protected function store(Request $request)
+    {
+        $rules = $this->rules();
+        $description = $request->description;
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $messageErrors = (new Validation)->modify($validator, $rules);
+
+            return response()->json([
+                'status' => false,
+                'alert' => 'danger',
+                'message' => 'Required Form',
+                'validation_errors' => $messageErrors,
+            ], 200);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $insert = new Training();
+            $insert->year = date('Y') + 1;
+            $insert->status = 'open';
+            $insert->description = $description;
+            $insert->user_id = Auth::user()->id;
+
+            $insert->save();
+
+            $this->afterMainInsert($insert, $request);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'alert' => 'success',
+                'message' => 'Data Was Created Successfully',
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
