@@ -53,6 +53,11 @@ class TrainingParticipantController extends DefaultController
         $baseUrlExcel = route($this->generalUri.'.export-excel-default');
         $baseUrlPdf = route($this->generalUri.'.export-pdf-default');
 
+        $params = "";
+        if(request('training_id')){
+            $params = "?training_id=".request('training_id');
+        }
+
         $moreActions = [
             [
                 'key' => 'import-excel-default',
@@ -85,7 +90,7 @@ class TrainingParticipantController extends DefaultController
         $data['table_headers'] = $this->tableHeaders;
         $data['title'] = $this->title;
         $data['uri_key'] = $this->generalUri;
-        $data['uri_list_api'] = route($this->generalUri . '.listapi');
+        $data['uri_list_api'] = route($this->generalUri . '.listapi') . $params;
         $data['uri_create'] = route($this->generalUri . '.create');
         $data['url_store'] = route($this->generalUri . '.store');
         $data['fields'] = $this->fields();
@@ -113,6 +118,10 @@ class TrainingParticipantController extends DefaultController
             $orderState = request('order_state');
         }
 
+        if (request('training_id')) {
+        $filters[] = ['training_participants.training_id', '=', request('training_id')];
+        }
+
         $dataQueries = TrainingParticipant::join('employees', 'employees.id', '=', 'training_participants.employee_id')
         ->join('trainings', 'trainings.id', '=', 'training_participants.training_id')
         ->join('workshops', 'workshops.id', '=', 'training_participants.workshop_id')
@@ -120,12 +129,12 @@ class TrainingParticipantController extends DefaultController
         ->where($filters)
         ->where(function ($query) use ($orThose) {
             $query->where('workshops.name', 'LIKE', '%' . $orThose . '%');
-            $query->where('employees.first_name', 'LIKE', '%' . $orThose . '%');
-            $query->where('departments.name', 'LIKE', '%' . $orThose . '%');
-            $query->where('training_participants.date', 'LIKE', '%' . $orThose . '%');
+            $query->orWhere('employees.first_name', 'LIKE', '%' . $orThose . '%');
+            $query->orWhere('departments.name', 'LIKE', '%' . $orThose . '%');
+            $query->orWhere('training_participants.date', 'LIKE', '%' . $orThose . '%');
         })
         ->orderBy($orderBy, $orderState)
-        ->select('training_participants.*', 'workshops.name as workshop', 'employees.first_name as employee', 'departments.name as department',);
+        ->select('training_participants.*', 'workshops.name as workshop', 'employees.first_name as employee', 'departments.name as department');
 
         return $dataQueries;
     }

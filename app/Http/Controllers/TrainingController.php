@@ -21,7 +21,7 @@ class TrainingController extends DefaultController
         $this->title = 'Training';
         $this->generalUri = 'training';
         // $this->arrPermissions = [];
-        $this->actionButtons = ['btn_edit', 'btn_show', 'btn_multilink', 'btn_delete'];
+        $this->actionButtons = ['btn_edit', 'btn_print', 'btn_multilink', 'btn_delete'];
 
         $this->tableHeaders = [
                     ['name' => 'No', 'column' => '#', 'order' => true], 
@@ -39,6 +39,37 @@ class TrainingController extends DefaultController
             'headers' => [ 
             ]
         ];
+    }
+
+    public function indexApi()
+    {
+        $permission = (new Constant)->permissionByMenu($this->generalUri);
+        $permission[] = 'multilink';
+        $permission[] =  'print';
+        
+        $eb = [];
+        $data_columns = [];
+        foreach ($this->tableHeaders as $key => $col) {
+            if ($key > 0) {
+                $data_columns[] = $col['column'];
+            }
+        }
+
+        foreach ($this->actionButtons as $key => $ab) {
+            if (in_array(str_replace("btn_", "", $ab), $permission)) {
+                $eb[] = $ab;
+            }
+        }
+
+        $dataQueries = $this->defaultDataQuery()->paginate(10);
+
+        $datas['extra_buttons'] = $eb;
+        $datas['data_columns'] = $data_columns;
+        $datas['data_queries'] = $dataQueries;
+        $datas['data_permissions'] = $permission;
+        $datas['uri_key'] = $this->generalUri;
+
+        return $datas;
     }
 
     public function index()
@@ -84,7 +115,10 @@ class TrainingController extends DefaultController
         $data['fields'] = $this->fields();
         $data['edit_fields'] = $this->fields('edit');
         $data['actionButtonViews'] = [
-            'easyadmin::backend.idev.buttons.delete', 'easyadmin::backend.idev.buttons.edit', 'easyadmin::backend.idev.buttons.show', 'easyadmin::backend.idev.buttons.import_default',
+            'easyadmin::backend.idev.buttons.delete', 
+            'easyadmin::backend.idev.buttons.edit', 
+            'easyadmin::backend.idev.buttons.show', 
+            'easyadmin::backend.idev.buttons.import_default',
             'easyadmin::backend.idev.buttons.multilink', 
         ];
         $data['templateImportExcel'] = "#";

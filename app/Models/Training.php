@@ -12,21 +12,26 @@ class Training extends Model
     protected $table = 'trainings';
     protected $primaryKey = 'id';
     protected $fillable = [];
-    protected $appends = ['btn_delete', 'btn_show', 'btn_edit', 'btn_multilink'];
+    protected $appends = ['btn_delete', 'btn_print', 'btn_edit', 'btn_multilink'];
 
     public function getBtnMultilinkAttribute()
     {
         $arrLink = [
             ['label' => 'Detail', 'url' => '#', 'icon' => 'ti ti-eye'],
-            ['label' => 'Participant', 'url' => url('participant')."?event_id=".$this->id, 'icon' => 'ti ti-users'],
-            ['label' => 'Master Question', 'url' => url('question')."?event_id=".$this->id, 'icon' => 'ti ti-question-mark'],
-            ['label' => 'Check In', 'url' => url('presence')."?event_id=".$this->id."&subtitle=".$this->name."&mode=Check In", 'icon' => 'ti ti-book'],
-            ['label' => 'Check Out', 'url' => url('presence')."?event_id=".$this->id."&subtitle=".$this->name."&mode=Check Out", 'icon' => 'ti ti-archive'],
+            ['label' => 'Participant', 'url' => url('training-participant')."?training_id=".$this->id, 'icon' => 'ti ti-users'],
+            ['label' => 'Recap Data', 'url' => url('question')."?training_id=".$this->id, 'icon' => 'ti ti-archive'],
         ];
 
-        $html = "<button type='button' data-links='".json_encode($arrLink)."' onclick='setMM(this)' title='Navigation' class='btn btn-outline-secondary btn-sm radius-6' style='margin:1px;' data-bs-toggle='modal' data-bs-target='#modalMultiLink'>
+        $html = "<button type='button' data-links='".json_encode($arrLink)."' onclick='setMM(this)' title='Navigation' class='btn btn-outline-warning btn-sm radius-6' style='margin:1px;' data-bs-toggle='modal' data-bs-target='#modalMultiLink'>
                     <i class='ti ti-list'></i>
                 </button>";
+
+        return $html;
+    }
+
+    public function getBtnPrintAttribute()
+    {
+        $html = "<a id='export-pdf' data-base-url='' class='btn btn-sm btn-outline-primary radius-6' target='_blank' href='http://google.com' title='Export PDF'><i class='ti ti-file'></i></a>";
 
         return $html;
     }
