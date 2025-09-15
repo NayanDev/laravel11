@@ -5,36 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Training extends Model
+class TrainingRecap extends Model
 {
     use HasFactory;
 
-    protected $table = 'trainings';
+    protected $table = 'training_participants';
     protected $primaryKey = 'id';
     protected $fillable = [];
-    protected $appends = ['btn_delete', 'btn_print', 'btn_edit', 'btn_multilink'];
+    protected $appends = ['btn_delete', 'btn_edit', 'btn_show'];
 
-    public function getBtnMultilinkAttribute()
-    {
-        $arrLink = [
-            ['label' => 'Detail', 'url' => '#', 'icon' => 'ti ti-eye'],
-            ['label' => 'Participant', 'url' => url('training-participant')."?training_id=".$this->id, 'icon' => 'ti ti-users'],
-            ['label' => 'Recap Data', 'url' => url('training-recap')."?training_id=".$this->id, 'icon' => 'ti ti-archive'],
-        ];
-
-        $html = "<button type='button' data-links='".json_encode($arrLink)."' onclick='setMM(this)' title='Navigation' class='btn btn-outline-warning btn-sm radius-6' style='margin:1px;' data-bs-toggle='modal' data-bs-target='#modalMultiLink'>
-                    <i class='ti ti-list'></i>
-                </button>";
-
-        return $html;
-    }
-
-    public function getBtnPrintAttribute()
-    {
-        $html = "<a id='export-pdf' data-base-url='' class='btn btn-sm btn-outline-primary radius-6' target='_blank' href='http://google.com' title='Export PDF'><i class='ti ti-file'></i></a>";
-
-        return $html;
-    }
 
     public function getBtnDeleteAttribute()
     {

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('trainings', function (Blueprint $table) {
             $table->id();
             $table->string('year');
-            $table->enum('status', ['draft', 'approve', 'open'])->default('draft');
+            $table->enum('status', ['open', 'submit', 'approve'])->default('open');
             $table->text('description')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();

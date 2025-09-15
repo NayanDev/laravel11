@@ -6,12 +6,10 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\TrainingParticipantController;
+use App\Http\Controllers\TrainingRecapController;
 use App\Http\Controllers\WorkshopController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
     Route::group(['middleware' => ['web', 'auth']], function () {
         // Route Department
@@ -63,4 +61,11 @@ use Illuminate\Support\Facades\Route;
         Route::get('training-participant-export-excel-default', [TrainingParticipantController::class, 'exportExcel'])->name('training-participant.export-excel-default');
         Route::post('training-participant-import-excel-default', [TrainingParticipantController::class, 'importExcel'])->name('training-participant.import-excel-default');
         Route::get('participant-ajax', [TrainingParticipantController::class, 'participantAjax']);
+
+        // Route Training Recap Data
+        Route::resource('training-recap', TrainingRecapController::class);
+        Route::get('training-recap-api', [TrainingRecapController::class, 'indexApi'])->name('training-recap.listapi');
+        Route::get('training-recap-export-pdf-default', [TrainingRecapController::class, 'exportPdf'])->name('training-recap.export-pdf-default');
+        Route::get('training-recap-export-excel-default', [TrainingRecapController::class, 'exportExcel'])->name('training-recap.export-excel-default');
+        Route::post('training-recap-import-excel-default', [TrainingRecapController::class, 'importExcel'])->name('training-recap.import-excel-default');
     });

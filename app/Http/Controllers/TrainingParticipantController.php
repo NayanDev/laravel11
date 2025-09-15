@@ -8,6 +8,7 @@ use App\Models\Workshop;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Helpers\Validation;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
@@ -28,7 +29,7 @@ class TrainingParticipantController extends DefaultController
         $this->title = 'Training Participant';
         $this->generalUri = 'training-participant';
         // $this->arrPermissions = [];
-        $this->actionButtons = ['btn_edit', 'btn_show', 'btn_delete'];
+        $this->actionButtons = ['btn_delete'];
 
         $this->tableHeaders = [
                     ['name' => 'No', 'column' => '#', 'order' => true], 
@@ -59,16 +60,6 @@ class TrainingParticipantController extends DefaultController
         }
 
         $moreActions = [
-            [
-                'key' => 'import-excel-default',
-                'name' => 'Import Excel',
-                'html_button' => "<button id='import-excel' type='button' class='btn btn-sm btn-info radius-6' href='#' data-bs-toggle='modal' data-bs-target='#modalImportDefault' title='Import Excel' ><i class='ti ti-upload'></i></button>"
-            ],
-            [
-                'key' => 'export-excel-default',
-                'name' => 'Export Excel',
-                'html_button' => "<a id='export-excel' data-base-url='".$baseUrlExcel."' class='btn btn-sm btn-success radius-6' target='_blank' href='" . url($this->generalUri . '-export-excel-default') . "'  title='Export Excel'><i class='ti ti-cloud-download'></i></a>"
-            ],
             [
                 'key' => 'export-pdf-default',
                 'name' => 'Export Pdf',
@@ -147,14 +138,26 @@ class TrainingParticipantController extends DefaultController
         }
 
         $workshop = Workshop::select(['id as value', 'name as text'])->get();
+        $planning = [
+            ['value' => 'planned', 'text' => 'Planned'],
+            ['value' => 'unplanned', 'text' => 'Unplanned'],
+        ];
 
         $fields = [
-            [
+                [
                     'type' => 'select2',
                     'label' => 'Workshop',
                     'name' => 'workshop_id',
                     'class' => 'col-md-12 my-2',
                     'options' => $workshop,
+                    'value' => ''
+                ],
+                [
+                    'type' => 'select2',
+                    'label' => 'Planing',
+                    'name' => 'plan',
+                    'class' => 'col-md-12 my-2',
+                    'options' => $planning,
                     'value' => ''
                 ],
                 [
@@ -168,9 +171,9 @@ class TrainingParticipantController extends DefaultController
                 [
                     'type' => 'bulktable_ajax',
                     'label' => 'Participant',
-                    'name' => 'participants',
+                    'name' => 'employee_id',
                     'class' => 'col-md-12 my-2',
-                    'key' => 'id',
+                    'key' => 'employeeId',
                     'ajaxUrl' => url('participant-ajax'),
                     'table_headers' => ['Name', 'Department', 'Position']
                 ],
@@ -199,6 +202,7 @@ class TrainingParticipantController extends DefaultController
                     ->orWhere('qualifications.name', 'LIKE', '%' . $orThose . '%');
             })
                 ->select(
+                'employees.id as employeeId',
                 'employees.first_name as employee',
                 'departments.name as department',
                 'positions.name as position',
@@ -223,8 +227,8 @@ class TrainingParticipantController extends DefaultController
     protected function store(Request $request)
     {
         $rules = $this->rules();
-        $strParticipants = $request->participants;
-        $trainingId = $request->training_id;
+        $strParticipants = $request->employee_id;
+        $trainingId = 1;
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -249,11 +253,11 @@ class TrainingParticipantController extends DefaultController
                 $insert = new TrainingParticipant();
                 $insert->employee_id = $user->id;
                 $insert->training_id = $trainingId;
-                $insert->workshop_id = 1;
-                $insert->plan = 'planned';
-                $insert->status = '';
-                $insert->user_id = 1;
-                $insert->date = date('Y');
+                $insert->workshop_id = $request->workshop_id;
+                $insert->plan = $request->plan;
+                $insert->status = 'open';
+                $insert->user_id = Auth::user()->id;
+                $insert->date = $request->date;
                 $insert->save();
             }
             

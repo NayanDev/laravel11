@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\Workshop;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Idev\EasyAdmin\app\Helpers\Validation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 
@@ -128,15 +134,6 @@ class WorkshopController extends DefaultController
 
         $fields = [
                     [
-                        'type' => 'select2',
-                        'label' => 'Department',
-                        'name' =>  'department_id',
-                        'class' => 'col-md-12 my-2',
-                        'required' => $this->flagRules('name', $id),
-                        'value' => (isset($edit)) ? $edit->department_id : '',
-                        'options' => $department
-                    ],
-                    [
                         'type' => 'text',
                         'label' => 'Workshop Name',
                         'name' =>  'name',
@@ -156,6 +153,50 @@ class WorkshopController extends DefaultController
         ];
 
         return $rules;
+    }
+
+    protected function store(Request $request)
+    {
+        $rules = $this->rules();
+        $description = $request->description;
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            $messageErrors = (new Validation)->modify($validator, $rules);
+
+            return response()->json([
+                'status' => false,
+                'alert' => 'danger',
+                'message' => 'Required Form',
+                'validation_errors' => $messageErrors,
+            ], 200);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $insert = new Workshop();
+            $insert->name = $request->name;
+            $insert->department_id = Auth::user()->employee->department_id;
+
+            $insert->save();
+
+            $this->afterMainInsert($insert, $request);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'alert' => 'success',
+                'message' => 'Data Was Created Successfully',
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 }

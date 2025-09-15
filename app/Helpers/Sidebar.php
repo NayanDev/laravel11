@@ -103,14 +103,23 @@ class Sidebar
           'childrens' => []
         ],
         [
-            'name' => 'Training Participant',
-            'icon' => 'ti ti-menu',
-            'key' => 'training-participant',
-            'base_key' => 'training-participant',
-            'visibility' => true,
-            'ajax_load' => false,
-            'childrens' => []
-          ],
+          'name' => 'Training Participant',
+          'icon' => 'ti ti-menu',
+          'key' => 'training-participant',
+          'base_key' => 'training-participant',
+          'visibility' => true,
+          'ajax_load' => false,
+          'childrens' => []
+        ],
+        [
+          'name' => 'Training Recap',
+          'icon' => 'ti ti-menu',
+          'key' => 'training-recap',
+          'base_key' => 'training-recap',
+          'visibility' => true,
+          'ajax_load' => false,
+          'childrens' => []
+        ],
         [
           'name' => 'Role',
           'icon' => 'ti ti-key',
