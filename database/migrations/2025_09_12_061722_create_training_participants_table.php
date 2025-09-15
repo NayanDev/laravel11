@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained()->onDelete('cascade');
             $table->foreignId('training_id')->constrained()->onDelete('cascade');
             $table->foreignId('workshop_id')->constrained()->onDelete('cascade');
-            $table->enum('plan', ['planned', 'unplanned'])->default('draft');
+            $table->enum('plan', ['planned', 'unplanned'])->default('planned');
             $table->enum('status', ['draft', 'approve', 'open'])->default('draft');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('date');
