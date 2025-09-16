@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Idev\EasyAdmin\app\Helpers\Validation;
 use Illuminate\Support\Facades\DB;
+use PDF;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 use Illuminate\Support\Facades\Auth;
@@ -261,5 +262,21 @@ class TrainingController extends DefaultController
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    protected function exporJadwalPdf()
+    {
+        $dataQueries = $this->defaultDataQuery()->take(1000)->get();
+
+        $datas['title'] = $this->title;
+        $datas['enable_number'] = true;
+        $datas['data_headers'] = $this->tableHeaders;
+        $datas['data_queries'] = $dataQueries;
+        $datas['exclude_columns'] = ['id', '#'];
+
+        $pdf = PDF::loadView('pdf.analisa_training', $datas)
+        ->setPaper('A4');
+
+        return $pdf->stream($this->title . '.pdf');
     }
 }

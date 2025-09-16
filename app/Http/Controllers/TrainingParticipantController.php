@@ -359,6 +359,7 @@ class TrainingParticipantController extends DefaultController
             ], 500);
         }
     }
+    
 
     public function exportPdf()
     {

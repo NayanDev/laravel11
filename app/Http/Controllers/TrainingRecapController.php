@@ -7,6 +7,11 @@ use App\Models\Training;
 use App\Models\TrainingParticipant;
 use App\Models\TrainingRecap;
 use App\Models\Workshop;
+use PDF;
+use Illuminate\Support\Facades\Validator;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 
@@ -63,7 +68,8 @@ class TrainingRecapController extends DefaultController
         $data['uri_list_api'] = route($this->generalUri . '.listapi') . "?training_id=" . request('training_id');
         $data['uri_create'] = route($this->generalUri . '.create');
         $data['url_store'] = route($this->generalUri . '.store') . "?training_id=" . request('training_id');
-        $data['fields'] = $this->fields();
+        // $data['fields'] = $this->fields();
+        $data['fields'] = $this->createFields(request('training_id'));
         $data['edit_fields'] = $this->fields('edit');
         $data['actionButtonViews'] = [
             'easyadmin::backend.idev.buttons.delete',
@@ -189,6 +195,22 @@ class TrainingRecapController extends DefaultController
         return $dataQueries;
     }
 
+    protected function createFields($trainingId)
+    {
+        $workshop = Workshop::get(['id as value', 'name as text']);
+        $fields[] = [
+                'type' => 'select',
+                'label' => 'Workshop',
+                'name' => 'workshop_id',
+                'class' => 'col-md-12 my-2',
+                'required' => true,
+                'value' => '',
+                'options' => $workshop
+            ];
+
+        return $fields;
+    }
+
     protected function fields($mode = "create", $id = '-')
     {
         $edit = null;
@@ -209,6 +231,43 @@ class TrainingRecapController extends DefaultController
         ];
 
         return $rules;
+    }
+
+    public function bulkUpdate(Request $request)
+    {
+        $trainingId = $request->event_id;
+        $workshopId = $request->question_ids;
+
+        $arrWorkshopId = json_decode($workshopId, true);
+
+        $trainingParticipant = TrainingParticipant::whereIn('id', $arrWorkshopId)->get();
+
+        try {
+            DB::beginTransaction();
+            
+            $numb = 0;
+            foreach ($trainingParticipant as $key => $q) {
+
+                $q->workshop_id = $trainingId;
+                $q->save();
+                $updatedCount ++;
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'alert' => 'success',
+                'message' => $updatedCount.' Question(s) Was Created Successfully',
+            ], 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 }

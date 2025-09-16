@@ -31,7 +31,7 @@ class Training extends Model
 
     public function getBtnPrintAttribute()
     {
-        $html = "<a id='export-pdf' data-base-url='' class='btn btn-sm btn-outline-primary radius-6' target='_blank' href='http://google.com' title='Export PDF'><i class='ti ti-file'></i></a>";
+        $html = "<a id='export-pdf' data-base-url='' class='btn btn-sm btn-outline-primary radius-6' target='_blank' href='".url('training-export-jadwal')."?training_id=".$this->id."' title='Export PDF'><i class='ti ti-file'></i></a>";
 
         return $html;
     }

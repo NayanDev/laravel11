@@ -50,6 +50,7 @@ use Illuminate\Support\Facades\Route;
         // Route Training
         Route::resource('training', TrainingController::class);
         Route::get('training-api', [TrainingController::class, 'indexApi'])->name('training.listapi');
+        Route::get('training-export-jadwal', [TrainingController::class, 'exporJadwalPdf'])->name('training.export-jadwal-pdf');
         Route::get('training-export-pdf-default', [TrainingController::class, 'exportPdf'])->name('training.export-pdf-default');
         Route::get('training-export-excel-default', [TrainingController::class, 'exportExcel'])->name('training.export-excel-default');
         Route::post('training-import-excel-default', [TrainingController::class, 'importExcel'])->name('training.import-excel-default');
@@ -68,4 +69,6 @@ use Illuminate\Support\Facades\Route;
         Route::get('training-recap-export-pdf-default', [TrainingRecapController::class, 'exportPdf'])->name('training-recap.export-pdf-default');
         Route::get('training-recap-export-excel-default', [TrainingRecapController::class, 'exportExcel'])->name('training-recap.export-excel-default');
         Route::post('training-recap-import-excel-default', [TrainingRecapController::class, 'importExcel'])->name('training-recap.import-excel-default');
+        Route::post('training-recap-bulk-update', [TrainingRecapController::class, 'bulkUpdate'])->name('training-recap.bulk-update');
+
     });
