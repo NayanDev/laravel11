@@ -6,6 +6,8 @@ use App\Models\Employee;
 use App\Models\Training;
 use App\Models\TrainingParticipant;
 use App\Models\Workshop;
+use Barryvdh\DomPDF\PDF as DomPDFPDF;
+use PDF;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Http\Request;
@@ -93,6 +95,7 @@ class TrainingParticipantController extends DefaultController
         $data['import_scripts'] = $this->importScripts;
         $data['import_styles'] = $this->importStyles;
         $data['filters'] = $this->filters();
+        $data['drawerExtraClass'] = 'w-50';
         
         return view($layout, $data);
     }
@@ -143,7 +146,7 @@ class TrainingParticipantController extends DefaultController
             ];
             $fields = [
                 [
-                    'type' => 'text',
+                    'type' => 'hidden',
                     'label' => 'Training Id',
                     'name' => 'training_id',
                     'class' => 'col-md-12 my-2',
@@ -355,5 +358,21 @@ class TrainingParticipantController extends DefaultController
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function exportPdf()
+    {
+        $dataQueries = $this->defaultDataQuery()->take(1000)->get();
+
+        $datas['title'] = $this->title;
+        $datas['enable_number'] = true;
+        $datas['data_headers'] = $this->tableHeaders;
+        $datas['data_queries'] = $dataQueries;
+        $datas['exclude_columns'] = ['id', '#'];
+
+        $pdf = PDF::loadView('pdf.analisa_training', $datas)
+        ->setPaper('A4');
+
+        return $pdf->stream($this->title . '.pdf');
     }
 }

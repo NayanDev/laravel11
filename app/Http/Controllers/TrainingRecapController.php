@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\Training;
 use App\Models\TrainingParticipant;
 use App\Models\TrainingRecap;
+use App\Models\Workshop;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 
@@ -13,7 +16,8 @@ class TrainingRecapController extends DefaultController
     protected $title;
     protected $generalUri;
     protected $tableHeaders;
-    // protected $actionButtons;
+    protected $tableHeadersWithCb;
+    protected $actionButtons;
     // protected $arrPermissions;
     protected $importExcelConfig;
 
@@ -22,7 +26,7 @@ class TrainingRecapController extends DefaultController
         $this->title = 'Training Recap';
         $this->generalUri = 'training-recap';
         // $this->arrPermissions = [];
-        $this->actionButtons = [];
+        $this->actionButtons = ['btn_delete'];
 
         $this->tableHeaders = [
                     ['name' => 'No', 'column' => '#', 'order' => true], 
@@ -34,53 +38,112 @@ class TrainingRecapController extends DefaultController
                     ['name' => 'Updated at', 'column' => 'updated_at', 'order' => true],
         ];
 
-
-        $this->importExcelConfig = [ 
-            'primaryKeys' => [''],
-            'headers' => [ 
-            ]
+        $this->tableHeadersWithCb = [
+                ['name' => 'Workshop', 'column' => 'workshop', 'order' => true], 
+                ['name' => 'Employee', 'column' => 'employee', 'order' => true], 
+                ['name' => 'Department', 'column' => 'department', 'order' => true], 
+                ['name' => 'Date', 'column' => 'date', 'order' => true], 
+                ['name' => 'Created at', 'column' => 'created_at', 'order' => true],
+                ['name' => 'Updated at', 'column' => 'updated_at', 'order' => true],
         ];
     }
 
     public function index()
     {
-        $baseUrlExcel = route($this->generalUri.'.export-excel-default');
-        $baseUrlPdf = route($this->generalUri.'.export-pdf-default');
-
-        $params = "";
-        if(request('training_id')){
-            $params = "?training_id=".request('training_id');
-        }
-
         $moreActions = [
         ];
 
-        $permissions =  $this->arrPermissions;
-        if ($this->dynamicPermission) {
-            $permissions = (new Constant())->permissionByMenu($this->generalUri);
-        }
-        $layout = (request('from_ajax') && request('from_ajax') == true) ? 'easyadmin::backend.idev.list_drawer_ajax' : 'easyadmin::backend.idev.list_drawer';
-        if(isset($this->drawerLayout)){
-            $layout = $this->drawerLayout;
-        }
+        $permissions = (new Constant())->permissionByMenu($this->generalUri);
         $data['permissions'] = $permissions;
         $data['more_actions'] = $moreActions;
-        $data['headerLayout'] = $this->pageHeaderLayout;
-        $data['table_headers'] = $this->tableHeaders;
+        // $data['headerLayout'] = $this->pageHeaderLayout;
+        $data['table_headers'] = (request('training_id')) ? $this->tableHeaders : $this->tableHeadersWithCb;
         $data['title'] = $this->title;
         $data['uri_key'] = $this->generalUri;
-        $data['uri_list_api'] = route($this->generalUri . '.listapi') . $params;
+        $data['uri_list_api'] = route($this->generalUri . '.listapi') . "?training_id=" . request('training_id');
         $data['uri_create'] = route($this->generalUri . '.create');
-        $data['url_store'] = route($this->generalUri . '.store');
+        $data['url_store'] = route($this->generalUri . '.store') . "?training_id=" . request('training_id');
         $data['fields'] = $this->fields();
         $data['edit_fields'] = $this->fields('edit');
-        $data['actionButtonViews'] = $this->actionButtonViews;
+        $data['actionButtonViews'] = [
+            'easyadmin::backend.idev.buttons.delete',
+        ];
         $data['templateImportExcel'] = "#";
         $data['import_scripts'] = $this->importScripts;
         $data['import_styles'] = $this->importStyles;
-        $data['filters'] = $this->filters();
+        // $data['filters'] = $this->filters();
+        $data['filters'] = request('training_id') ? $this->filters() : [];
+        $data['drawerExtraClass'] = 'w-50';
+
+        $layout = 'easyadmin::backend.idev.list_drawer';
+
+        if (request('training_id')) {
+            $layout = 'easyadmin::backend.idev.list_drawer_with_checkbox';
+        }
         
         return view($layout, $data);
+    }
+
+    protected function filters()
+    {
+        $department = Department::get(['id as value', 'name as text']);
+        $workshop = Workshop::get(['id as value', 'name as text']);
+
+        $fields = [
+            [
+                'type' => 'select',
+                'label' => 'Department',
+                'name' => 'filter_department_id',
+                'class' => 'col-md-3',
+                'options' => $department,
+            ],
+            [
+                'type' => 'select',
+                'label' => 'Workshop',
+                'name' => 'filter_workshop_id',
+                'class' => 'col-md-3',
+                'options' => $workshop,
+            ],
+        ];
+
+        return $fields;
+    }
+
+    public function indexApi()
+    {
+        $permission = (new Constant)->permissionByMenu($this->generalUri);
+        // $permission[] = 'answer';
+
+        $eb = [];
+        $data_columns = [];
+        if (request('training_id') != null) {
+            foreach ($this->tableHeaders as $key => $col) {
+                if ($key > 0) {
+                    $data_columns[] = $col['column'];
+                }
+            }
+        } else {
+            $data_columns[] = 'cb_event';
+            foreach ($this->tableHeadersWithCb as $key => $col) {
+                $data_columns[] = $col['column'];
+            }
+        }
+
+        foreach ($this->actionButtons as $key => $ab) {
+            if (in_array(str_replace("btn_", "", $ab), $permission)) {
+                $eb[] = $ab;
+            }
+        }
+
+        $dataQueries = $this->defaultDataQuery()->paginate(10);
+
+        $datas['extra_buttons'] = $eb;
+        $datas['data_columns'] = $data_columns;
+        $datas['data_queries'] = $dataQueries;
+        $datas['data_permissions'] = $permission;
+        $datas['uri_key'] = $this->generalUri;
+
+        return $datas;
     }
 
     protected function defaultDataQuery()
@@ -99,6 +162,14 @@ class TrainingRecapController extends DefaultController
 
         if (request('training_id')) {
         $filters[] = ['training_participants.training_id', '=', request('training_id')];
+        }
+
+        if (request('filter_department_id')) {
+            $filters[] = ['departments.id', '=', request('filter_department_id')];
+        }
+
+        if (request('filter_workshop_id')) {
+            $filters[] = ['workshops.id', '=', request('filter_workshop_id')];
         }
 
         $dataQueries = TrainingParticipant::join('employees', 'employees.id', '=', 'training_participants.employee_id')

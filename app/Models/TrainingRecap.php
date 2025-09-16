@@ -12,8 +12,14 @@ class TrainingRecap extends Model
     protected $table = 'training_participants';
     protected $primaryKey = 'id';
     protected $fillable = [];
-    protected $appends = ['btn_delete', 'btn_edit', 'btn_show'];
+    protected $appends = ['btn_delete', 'btn_edit', 'btn_show', 'cb_event'];
 
+    public function getCbEventAttribute()
+    {
+        $html = "<input type='checkbox' class='cb-question' value='".$this->id."'>";
+
+        return $html;
+    }
 
     public function getBtnDeleteAttribute()
     {
