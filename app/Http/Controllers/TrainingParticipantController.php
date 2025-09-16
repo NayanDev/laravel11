@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Training;
 use App\Models\TrainingParticipant;
 use App\Models\Workshop;
 use Illuminate\Support\Facades\Validator;
@@ -63,7 +64,7 @@ class TrainingParticipantController extends DefaultController
             [
                 'key' => 'export-pdf-default',
                 'name' => 'Export Pdf',
-                'html_button' => "<a id='export-pdf' data-base-url='".$baseUrlPdf."' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . url($this->generalUri . '-export-pdf-default') . "' title='Export PDF'><i class='ti ti-file'></i></a>"
+                'html_button' => "<a id='export-pdf' data-base-url='".$baseUrlPdf."' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . url($this->generalUri . '-export-pdf-default') . "' title='Export PDF'><i class='ti ti-file'></i> Print</a>"
             ],
         ];
 
@@ -84,7 +85,8 @@ class TrainingParticipantController extends DefaultController
         $data['uri_list_api'] = route($this->generalUri . '.listapi') . $params;
         $data['uri_create'] = route($this->generalUri . '.create');
         $data['url_store'] = route($this->generalUri . '.store');
-        $data['fields'] = $this->fields();
+        // $data['fields'] = $this->fields();
+        $data['fields'] = $this->createFields(request('training_id'));
         $data['edit_fields'] = $this->fields('edit');
         $data['actionButtonViews'] = $this->actionButtonViews;
         $data['templateImportExcel'] = "#";
@@ -128,6 +130,84 @@ class TrainingParticipantController extends DefaultController
         ->select('training_participants.*', 'workshops.name as workshop', 'employees.first_name as employee', 'departments.name as department');
 
         return $dataQueries;
+    }
+
+    private function createFields($trainingId)
+    {
+        if(isset($trainingId)){
+            $training = Training::where('id', $trainingId)->first();
+            $workshop = Workshop::select(['id as value', 'name as text'])->get();
+            $planning = [
+                ['value' => 'planned', 'text' => 'Planned'],
+                ['value' => 'unplanned', 'text' => 'Unplanned'],
+            ];
+            $fields = [
+                [
+                    'type' => 'text',
+                    'label' => 'Training Id',
+                    'name' => 'training_id',
+                    'class' => 'col-md-12 my-2',
+                    'value' => $training ? $training->id : ''
+                ],
+                
+                [
+                    'type' => 'select2',
+                    'label' => 'Workshop',
+                    'name' => 'workshop_id',
+                    'class' => 'col-md-12 my-2',
+                    'options' => $workshop,
+                    'value' => ''
+                ],
+                [
+                    'type' => 'select2',
+                    'label' => 'Planing',
+                    'name' => 'plan',
+                    'class' => 'col-md-12 my-2',
+                    'options' => $planning,
+                    'value' => ''
+                ],
+                [
+                    'type' => 'datetime',
+                    'label' => 'Date',
+                    'name' =>  'date',
+                    'class' => 'col-md-12 my-2',
+                    'value' => (isset($edit)) ? $edit->name : ''
+                ],
+                [
+                    'type' => 'bulktable_ajax',
+                    'label' => 'Participant',
+                    'name' => 'employee_id',
+                    'class' => 'col-md-12 my-2',
+                    'key' => 'employeeId',
+                    'ajaxUrl' => url('participant-ajax'),
+                    'table_headers' => ['Name', 'Department', 'Position']
+                ],
+            ];
+        }else{
+            $training = Training::get(['id as value', 'name as text']);
+
+            $fields = [
+                [
+                    'type' => 'select2',
+                    'label' => 'Event',
+                    'name' => 'event_id',
+                    'class' => 'col-md-12 my-2',
+                    'options' => $training,
+                    'value' => ''
+                ],
+                [
+                    'type' => 'bulktable_ajax',
+                    'label' => 'Peserta',
+                    'name' => 'participants',
+                    'class' => 'col-md-12 my-2',
+                    'key' => 'id',
+                    'ajaxUrl' => url('participant-ajax'),
+                    'table_headers' => ['Nama']
+                ],
+            ];
+        }
+
+        return $fields;
     }
 
     protected function fields($mode = "create", $id = '-')
@@ -228,7 +308,6 @@ class TrainingParticipantController extends DefaultController
     {
         $rules = $this->rules();
         $strParticipants = $request->employee_id;
-        $trainingId = 1;
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
@@ -252,7 +331,7 @@ class TrainingParticipantController extends DefaultController
             foreach($users as $key => $user){
                 $insert = new TrainingParticipant();
                 $insert->employee_id = $user->id;
-                $insert->training_id = $trainingId;
+                $insert->training_id = $request->training_id;
                 $insert->workshop_id = $request->workshop_id;
                 $insert->plan = $request->plan;
                 $insert->status = 'open';
