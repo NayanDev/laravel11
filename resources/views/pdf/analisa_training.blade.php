@@ -160,7 +160,7 @@
             <thead>
                 <tr>
                     <th rowspan="3">No</th>
-                    <th rowspan="3">Jabatan</th>
+                    <th rowspan="3"><span style="transform: rotate(90deg);border:1px solid black;">Jabatan Test</span></th>
                     <th rowspan="3">Jumlah<br>Personil</th>
                     <th colspan="17">Jenis Pelatihan</th>
                 </tr>

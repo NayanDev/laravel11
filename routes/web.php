@@ -7,6 +7,7 @@ use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\TrainingParticipantController;
 use App\Http\Controllers\TrainingRecapController;
+use App\Http\Controllers\TrainingUnplannedController;
 use App\Http\Controllers\WorkshopController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,4 +72,10 @@ use Illuminate\Support\Facades\Route;
         Route::post('training-recap-import-excel-default', [TrainingRecapController::class, 'importExcel'])->name('training-recap.import-excel-default');
         Route::post('training-recap-bulk-update', [TrainingRecapController::class, 'bulkUpdate'])->name('training-recap.bulk-update');
 
+        // Route Training Unplanned
+        Route::resource('training-unplanned', TrainingUnplannedController::class);
+        Route::get('training-unplanned-api', [TrainingUnplannedController::class, 'indexApi'])->name('training-unplanned.listapi');
+        Route::get('training-unplanned-export-pdf-default', [TrainingUnplannedController::class, 'exportPdf'])->name('training-unplanned.export-pdf-default');
+        Route::get('training-unplanned-export-excel-default', [TrainingUnplannedController::class, 'exportExcel'])->name('training-unplanned.export-excel-default');
+        Route::post('training-unplanned-import-excel-default', [TrainingUnplannedController::class, 'importExcel'])->name('training-unplanned.import-excel-default');
     });

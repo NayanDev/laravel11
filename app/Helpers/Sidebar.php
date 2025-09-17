@@ -121,6 +121,15 @@ class Sidebar
           'childrens' => []
         ],
         [
+          'name' => 'Training Unplanned',
+          'icon' => 'ti ti-menu',
+          'key' => 'training-unplanned',
+          'base_key' => 'training-unplanned',
+          'visibility' => true,
+          'ajax_load' => false,
+          'childrens' => []
+        ],
+        [
           'name' => 'Role',
           'icon' => 'ti ti-key',
           'key' => 'role',

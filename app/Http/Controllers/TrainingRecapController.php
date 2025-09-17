@@ -235,22 +235,25 @@ class TrainingRecapController extends DefaultController
 
     public function bulkUpdate(Request $request)
     {
-        $trainingId = $request->event_id;
-        $workshopId = $request->question_ids;
+        // $workshop = $request->workshop_id;
+        $workshopIds = $request->workshop_id;
 
-        $arrWorkshopId = json_decode($workshopId, true);
+        $arrTrainingIds = json_decode($workshopIds, true);
 
-        $trainingParticipant = TrainingParticipant::whereIn('id', $arrWorkshopId)->get();
+        // Ambil semua data yang akan diupdate
+        $trainings = TrainingParticipant::whereIn('id', $arrTrainingIds)->get();
 
         try {
             DB::beginTransaction();
-            
-            $numb = 0;
-            foreach ($trainingParticipant as $key => $q) {
 
-                $q->workshop_id = $trainingId;
-                $q->save();
-                $updatedCount ++;
+            $numb = 0;
+
+            foreach ($trainings as $t) {
+                // Update Data
+                $t->workshop_id = $workshopIds; 
+                $t->save();
+
+                $numb++;
             }
 
             DB::commit();
@@ -258,9 +261,10 @@ class TrainingRecapController extends DefaultController
             return response()->json([
                 'status' => true,
                 'alert' => 'success',
-                'message' => $updatedCount.' Question(s) Was Created Successfully',
+                'message' => $numb . ' Workshops was updated successfully',
             ], 200);
-        } catch (Exception $e) {
+
+        } catch (\Exception $e) {
             DB::rollBack();
 
             return response()->json([
