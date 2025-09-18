@@ -65,12 +65,12 @@ class TrainingParticipantController extends DefaultController
             [
                 'key' => 'export-pdf-default',
                 'name' => 'Export Pdf Portrait',
-                'html_button' => "<a id='export-pdf-portrait' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=analysis&orientasi=portrait' title='Export PDF Portrait'><i class='ti ti-file'></i> Print Analysis</a>"
+                'html_button' => "<a id='export-pdf-portrait' class='btn btn-sm btn-primary radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=analysis&orientasi=portrait' title='Export PDF Portrait'><i class='ti ti-file'></i> Print Analysis</a>"
             ],
             [
                 'key' => 'export-pdf-default',
                 'name' => 'Export Pdf Landscape',
-                'html_button' => "<a id='export-pdf-landscape' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=schedule&orientasi=landscape' title='Export PDF Landscape'><i class='ti ti-file'></i> Print Schedule</a>"
+                'html_button' => "<a id='export-pdf-landscape' class='btn btn-sm btn-success radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=schedule&orientasi=landscape' title='Export PDF Landscape'><i class='ti ti-file'></i> Print Schedule</a>"
             ],
         ];
 
