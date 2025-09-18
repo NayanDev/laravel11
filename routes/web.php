@@ -59,10 +59,10 @@ use Illuminate\Support\Facades\Route;
         // Route Training Participant
         Route::resource('training-participant', TrainingParticipantController::class);
         Route::get('training-participant-api', [TrainingParticipantController::class, 'indexApi'])->name('training-participant.listapi');
-        Route::get('training-participant-export-pdf-default', [TrainingParticipantController::class, 'exportPdf'])->name('training-participant.export-pdf-default');
         Route::get('training-participant-export-excel-default', [TrainingParticipantController::class, 'exportExcel'])->name('training-participant.export-excel-default');
         Route::post('training-participant-import-excel-default', [TrainingParticipantController::class, 'importExcel'])->name('training-participant.import-excel-default');
         Route::get('participant-ajax', [TrainingParticipantController::class, 'participantAjax']);
+        Route::get('training-participant-export-pdf', [TrainingParticipantController::class, 'exportPdf'])->name('training-participant.export-pdf');
 
         // Route Training Recap Data
         Route::resource('training-recap', TrainingRecapController::class);

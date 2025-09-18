@@ -6,8 +6,7 @@ use App\Models\Employee;
 use App\Models\Training;
 use App\Models\TrainingParticipant;
 use App\Models\Workshop;
-use Barryvdh\DomPDF\PDF as DomPDFPDF;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Http\Request;
@@ -55,7 +54,7 @@ class TrainingParticipantController extends DefaultController
     public function index()
     {
         $baseUrlExcel = route($this->generalUri.'.export-excel-default');
-        $baseUrlPdf = route($this->generalUri.'.export-pdf-default');
+        $baseUrlPdf = route($this->generalUri.'.export-pdf');
 
         $params = "";
         if(request('training_id')){
@@ -65,8 +64,13 @@ class TrainingParticipantController extends DefaultController
         $moreActions = [
             [
                 'key' => 'export-pdf-default',
-                'name' => 'Export Pdf',
-                'html_button' => "<a id='export-pdf' data-base-url='".$baseUrlPdf."' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . url($this->generalUri . '-export-pdf-default') . "' title='Export PDF'><i class='ti ti-file'></i> Print</a>"
+                'name' => 'Export Pdf Portrait',
+                'html_button' => "<a id='export-pdf-portrait' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=analysis&orientasi=portrait' title='Export PDF Portrait'><i class='ti ti-file'></i> Print Analysis</a>"
+            ],
+            [
+                'key' => 'export-pdf-default',
+                'name' => 'Export Pdf Landscape',
+                'html_button' => "<a id='export-pdf-landscape' class='btn btn-sm btn-danger radius-6' target='_blank' href='" . $baseUrlPdf . $params . "&type=schedule&orientasi=landscape' title='Export PDF Landscape'><i class='ti ti-file'></i> Print Schedule</a>"
             ],
         ];
 
@@ -363,17 +367,38 @@ class TrainingParticipantController extends DefaultController
 
     public function exportPdf()
     {
-        $dataQueries = $this->defaultDataQuery()->take(1000)->get();
+        // Ambil nilai dari query string
+    $type = strtolower(request()->get('type', 'analysis')); // default: analysis
+    $orientasi = strtolower(request()->get('orientasi', 'portrait')); // default: portrait
 
-        $datas['title'] = $this->title;
-        $datas['enable_number'] = true;
-        $datas['data_headers'] = $this->tableHeaders;
-        $datas['data_queries'] = $dataQueries;
-        $datas['exclude_columns'] = ['id', '#'];
+    // Validasi nilai yang masuk
+    if (!in_array($type, ['analysis', 'schedule'])) {
+        $type = 'analysis';
+    }
 
-        $pdf = PDF::loadView('pdf.analisa_training', $datas)
-        ->setPaper('A4');
+    if (!in_array($orientasi, ['portrait', 'landscape'])) {
+        $orientasi = 'portrait';
+    }
 
-        return $pdf->stream($this->title . '.pdf');
+   $view = $type === 'analysis' 
+    ? 'pdf.analisa_training'  // sesuai dengan 'analysis'
+    : 'pdf.rencana_training'; // untuk 'schedule'
+
+    // Ambil data
+    $dataQueries = $this->defaultDataQuery()->take(1000)->get();
+
+    $datas = [
+        'title' => $this->title,
+        'enable_number' => true,
+        'data_headers' => $this->tableHeaders,
+        'data_queries' => $dataQueries,
+        'exclude_columns' => ['id', '#'],
+    ];
+
+    // Generate PDF
+    $pdf = PDF::loadView($view, $datas)
+        ->setPaper('A4', $orientasi); // Sekarang ini valid: portrait/landscape
+
+    return $pdf->stream($this->title . '.pdf');
     }
 }

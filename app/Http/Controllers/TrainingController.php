@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Idev\EasyAdmin\app\Helpers\Validation;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Idev\EasyAdmin\app\Helpers\Constant;
 use Idev\EasyAdmin\app\Http\Controllers\DefaultController;
 use Illuminate\Support\Facades\Auth;
@@ -274,8 +274,8 @@ class TrainingController extends DefaultController
         $datas['data_queries'] = $dataQueries;
         $datas['exclude_columns'] = ['id', '#'];
 
-        $pdf = PDF::loadView('pdf.analisa_training', $datas)
-        ->setPaper('A4');
+        $pdf = PDF::loadView('pdf.jadwal_training', $datas)
+        ->setPaper('A4', 'landscape');
 
         return $pdf->stream($this->title . '.pdf');
     }

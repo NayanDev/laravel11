@@ -1,134 +1,113 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rencana Usulan Pelatihan</title>
+    <meta charset="utf-8">
+    <title>{{ $title }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 10px;
+            font-size: 6px;
+            margin: 0;
+            padding: 0;
+            font-family: 'DejaVu Sans', sans-serif;
         }
 
-        /* .container {
-            border: 1px solid black;
-            width: 100%;
-            max-width: 1200px;
-            margin: auto;
-        } */
+        .text-start {
+            text-align: left;
+        }
 
         .letterhead {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             overflow: visible;
-            border: 2px solid black;
+            padding-bottom: 10px;
+            /* border: 2px solid black; */
         }
 
         .letterhead img {
             position: absolute;
-            width: 80px;
-            padding: 10px;
+            width: 40px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            /* border: 1px solid green; */
         }
 
         .letterhead h3 {
+            /* margin-top: 20px; */
+            margin-bottom: 0;
             text-align: right;
-            padding: 20px;
+            /* padding: 10px; */
+            /* border: 1px solid red; */
+            padding: 0px;
         }
-
-        .header-title {
-            text-align: center;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .header-subtitle {
-            text-align: center;
+        
+        .letterhead p {
+            text-align: right;
+            margin-top: 0;
             margin-bottom: 20px;
-            font-size: 14px;
+            padding: 0px;
+            /* border:1px solid blue; */
         }
 
         .info-section {
             margin-bottom: 15px;
             font-size: 14px;
         }
-
+        
         table {
-            width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            width: 100%;
         }
-
-        th,
-        td {
-            border: 2px solid #333;
-            padding: 8px;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        thead th {
-            background-color: #e0e0e0;
-            text-align: center;
-            vertical-align: middle;
-            font-weight: bold;
-        }
-
-        tbody td {
+        th, td {
+            border: 1px solid #000;
+            padding: 4px;
             text-align: center;
         }
-
-        tbody td:first-child {
-            text-align: center;
+        .no-border {
+            border: none !important;
         }
 
-        .signatures {
-            margin-top: 40px;
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-            font-size: 14px;
-        }
+    .th {
+        border: 1px solid black;
+        font-size: 6px;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        vertical-align: middle;
+        height: 80px;
+        width: 25px;
+        position: relative; /* Tambahkan ini */
+    }
 
-        .signature-block {
-            width: 250px;
-        }
+    .rotate-text {
+        position: absolute;    /* Posisi absolute agar bisa full */
+        top: 50%;             /* Posisi vertical center */
+        left: 50%;           /* Posisi horizontal center */
+        transform: translate(-50%, -50%) rotate(-90deg); /* Gabung translate dan rotate */
+        width: 80px;        /* Sesuaikan dengan height th */
+        display: flex;       /* Gunakan flex untuk centering content */
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
 
-        .signature-space {
-            height: 70px;
-            margin-bottom: 5px;
-        }
-
-        .header-vertikal {
-            /* 1. Ubah arah tulisan menjadi vertikal */
-            writing-mode: vertical-rl;
-
-            /* 2. Putar 180 derajat agar huruf tidak terbalik dan terbaca dari bawah ke atas */
-            transform: rotate(180deg);
-
-            /* 3. Penyesuaian lain agar rapi */
-            white-space: nowrap;
-            /* Mencegah teks terpotong ke baris baru */
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .highlight {
+    .highlight {
         background-color: gray; /* Warna kuning */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="letterhead">
-            <img src="logo.png" alt="PT Sampharindo">
+    <div class="letterhead">
+            <img src="{{ asset('easyadmin/idev/img/kop-dokumen.png') }}" alt="PT Sampharindo">
             <h3>RENCANA USULAN PELATIHAN</h3>
-        </div>
-        <div class="info-section">
-            <strong>Divisi / Bagian / Unit Kerja : Produksi</strong> 
-            <strong style="float: right;">Tahun : 2025</strong> 
-        </div>
-        <table>
+            <br><br>
+    </div>
+    <div class="info-section">
+        <span>Divisi / Bagian / Unit Kerja : Produksi</span> 
+        <span style="float: right;">Tahun : 2025</span> 
+    </div>
+    <br>
+
+    <table>
             <thead>
                 <tr>
                     <th rowspan="2">No</th>
@@ -204,7 +183,7 @@
             <tbody>
                 <tr>
                     <td>1</td>
-                    <td>Warehouse in Pharmaceutical Industry</td>
+                    <td class="text-start">Warehouse in Pharmaceutical Industry</td>
                     <td>2 Jam</td>
                     <td>Internal</td>
                     <td>27 Personil</td>
@@ -260,7 +239,7 @@
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>Leadership</td>
+                    <td class="text-start">Leadership</td>
                     <td>2 Jam</td>
                     <td>Eksternal</td>
                     <td>7 Personil</td>
@@ -316,7 +295,7 @@
                 </tr>
                 <tr>
                     <td>3</td>
-                    <td>Tanggap Darurat</td>
+                    <td class="text-start">Tanggap Darurat</td>
                     <td>2 Jam</td>
                     <td>Internal</td>
                     <td>6 Personil</td>
@@ -372,7 +351,7 @@
                 </tr>
                 <tr>
                     <td>4</td>
-                    <td>Manual Handling K3</td>
+                    <td class="text-start">Manual Handling K3</td>
                     <td>2 Jam</td>
                     <td>Internal</td>
                     <td>23 Personil</td>
@@ -764,27 +743,27 @@
                 </tr>
             </tbody>
         </table>
-        <div class="signatures">
-            <div class="signature-block">
+<br><br>
+    <table class="no-border" style="width:100%;">
+        <tr>
+            <td class="no-border text-center"style="width:20%;">
                 Disiapkan Oleh,
-                <div class="signature-space">
-                    <img width="200" src="ttd.png" alt="ttd">
-                </div>
-                <strong><u>Anta Wardana</u></strong><br>
-                Kabag SCM
-            </div>
-            <div class="signature-block">
+                <br><br>
+                <img width="75" src="{{ asset('easyadmin/idev/img/ttd.png') }}" alt="Tanda Tangan">
+                <br>
+                <strong>Anto Wardana</strong>
+            </td>
+            <td class="no-border" style="width:20%;"></td>
+            <td class="no-border" style="width:20%;"></td>
+            <td class="no-border" style="width:20%;"></td>
+            <td class="no-border text-center"style="width:20%;">
                 Disetujui Oleh,
-                <div class="signature-space">
-                    <img width="200" src="ttd.png" alt="ttd">
-                </div>
-                <strong><u>Ramadhan Reza Akbar</u></strong><br>
-                Manager SCM
-                    
-                <br><br><br>
-                <span style="float: right;">F.DUP.34.R.00.T.01.07.10</span>
-            </div>
-        </div>
-    </div>
+                <br><br>
+                <img width="75" src="{{ asset('easyadmin/idev/img/ttd.png') }}" alt="Tanda Tangan">
+                <br>
+                <strong>Ramadhan Reza Akbar</strong>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
