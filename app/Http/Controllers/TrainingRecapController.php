@@ -233,45 +233,83 @@ class TrainingRecapController extends DefaultController
         return $rules;
     }
 
+    // public function bulkUpdate(Request $request)
+    // {
+    //     // $workshop = $request->workshop_id;
+    //     $workshopIds = $request->workshop_id;
+    //     $arrTrainingIds = json_decode($workshopIds, true);
+
+    //     // Ambil semua data yang akan diupdate
+    //     $trainings = TrainingParticipant::whereIn('id', $arrTrainingIds)->get();
+
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $numb = 0;
+
+    //         foreach ($trainings as $t) {
+    //             // Update Data
+    //             $t->workshop_id = $workshopIds; 
+    //             $t->save();
+
+    //             $numb++;
+    //         }
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'alert' => 'success',
+    //             'message' => $numb . ' Workshops was updated successfully',
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
+
     public function bulkUpdate(Request $request)
-    {
-        // $workshop = $request->workshop_id;
-        $workshopIds = $request->workshop_id;
+{
+    $workshopid = $request->workshop_id;
+    $participants = $request->participantid;
+    $updates = json_decode($participants, true);
 
-        $arrTrainingIds = json_decode($workshopIds, true);
+    try {
+        DB::beginTransaction();
 
-        // Ambil semua data yang akan diupdate
-        $trainings = TrainingParticipant::whereIn('id', $arrTrainingIds)->get();
+        $numb = 0;
 
-        try {
-            DB::beginTransaction();
-
-            $numb = 0;
-
-            foreach ($trainings as $t) {
-                // Update Data
-                $t->workshop_id = $workshopIds; 
-                $t->save();
-
+        foreach ($updates as $id => $person) {
+            // Update setiap participant berdasarkan ID
+            $training = TrainingParticipant::find($person);
+            if ($training) {
+                $training->workshop_id = $workshopid;
+                $training->save();
                 $numb++;
             }
-
-            DB::commit();
-
-            return response()->json([
-                'status' => true,
-                'alert' => 'success',
-                'message' => $numb . ' Workshops was updated successfully',
-            ], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage(),
-            ], 500);
         }
+
+        DB::commit();
+
+        return response()->json([
+            'status' => true,
+            'alert' => 'success',
+            'message' => $numb . ' Workshops were updated successfully',
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'status' => false,
+            'message' => $e->getMessage(),
+        ], 500);
     }
+}
 
 }

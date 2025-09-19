@@ -9,6 +9,8 @@ class Department extends Model
 {
     use HasFactory;
 
+    // protected $connection= 'mysql2';
+
     protected $table = 'departments';
     protected $primaryKey = 'id';
     protected $fillable = ["name"];
